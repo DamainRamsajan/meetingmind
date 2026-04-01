@@ -6,7 +6,7 @@
 import { useState, useRef } from 'react'
 import axios from 'axios'
 
-const API = 'http://localhost:8000'
+const API = 'https://meetingmind-d7dx.onrender.com' 
 
 const STEPS = {
   UPLOAD: 'upload',
