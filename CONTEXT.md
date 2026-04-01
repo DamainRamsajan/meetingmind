@@ -22,7 +22,7 @@ phone to their laptop, uploads it to MeetingMind, and gets back:
 
 ---
 
-## Current state: WORKING LOCALLY — END TO END TESTED ✅
+## Current state: WORKING LOCALLY + UI REDESIGN COMPLETE ✅
 
 ### What works
 - ✅ Audio file upload (MP3 and M4A)
@@ -32,13 +32,31 @@ phone to their laptop, uploads it to MeetingMind, and gets back:
 - ✅ Groq extraction → summary, action items, decisions, key topics
 - ✅ Groq email drafting
 - ✅ Full results display — summary card, action items table, email + copy button
-- ✅ End to end test passed with real audio file
+- ✅ Full UI redesign — dark futuristic theme (navy/electric blue/purple)
+- ✅ Workshop landing page — banner, architecture SVG diagram, workshop materials
+- ✅ AIAB_banner.png displayed as full-width hero
+- ✅ AAIB_brochure.png displayed as brochure thumbnail card
+- ✅ AI_Agents_Bootcamp_Curriculum.pdf linked — opens in new tab
+- ✅ Curriculum thumbnail — banner image reused with overlay
+- ✅ Tech stack badges displayed under architecture diagram
+- ✅ Footer: Built with Intellica AI · Powered by AssemblyAI + Groq
 
 ### What is NOT done yet
 - ❌ GitHub push still blocked (see GitHub issue below)
 - ❌ Render backend deployment
 - ❌ Netlify frontend deployment
 - ❌ Live demo URL for students
+- ❌ In-browser voice recording (Start Meeting button — next feature)
+- ❌ UI improvement: MeetingMind upload section needs redesign
+
+---
+
+## Page structure (top to bottom)
+1. BANNER — AIAB_banner.png full width + UWI venue overlay
+2. ARCHITECTURE — SVG three-agent pipeline diagram + tech stack badges
+3. WORKSHOP MATERIALS — brochure card + curriculum PDF card (side by side)
+4. THE APP — MeetingMind upload + pipeline + results (dark theme)
+5. FOOTER — Intellica AI credit line
 
 ---
 
@@ -51,9 +69,13 @@ meetingmind/
 │   ├── .env                 ✅ Has real keys — NEVER commit this
 │   └── .env.example         ✅ Placeholder text only — safe for GitHub
 ├── frontend/
+│   ├── public/
+│   │   ├── AIAB_banner.png          ✅ Workshop banner image
+│   │   ├── AAIB_brochure.png        ✅ Brochure thumbnail
+│   │   └── AI_Agents_Bootcamp_Curriculum.pdf  ✅ Curriculum PDF
 │   ├── src/
-│   │   ├── App.jsx          ✅ Complete — full UI with polling + speaker naming
-│   │   └── index.css        ✅ Complete
+│   │   ├── App.jsx          ✅ Complete — full redesigned UI
+│   │   └── index.css        ✅ Complete — dark theme + pulse animation
 │   └── package.json         ✅ Complete
 ├── README.md                ✅ Complete
 ├── ARCHITECTURE.md          ✅ Complete
@@ -70,74 +92,82 @@ meetingmind/
 | AssemblyAI | 32-char string | Transcription + diarization | ✅ Working |
 | Groq | gsk_ | LLM extraction + email draft | ✅ Working |
 
-Keys are stored in `backend/.env` — never commit that file.
+Keys stored in backend/.env — never commit that file.
 
 ---
 
-## Known fixes already applied (do not revert these)
+## Design tokens (current theme)
+```
+bg:      #0a0e1a  (deep dark navy)
+card:    #111827  (dark card)
+border:  #1e3a5f  (dark blue border)
+accent:  #00d4ff  (electric blue)
+purple:  #7c3aed  (violet)
+text:    #f0f4f8  (white-ish)
+muted:   #8899aa  (grey)
+success: #00e676  (green)
+error:   #ff4d4d  (red)
+```
+
+---
+
+## Known fixes already applied (do not revert)
 | Problem | Fix applied |
 |---|---|
-| Chromebook pip3 blocked | Add `--break-system-packages` to all pip3 commands |
-| uvicorn command not found | Use `python3 -m uvicorn` instead of `uvicorn` |
-| Must run from correct folder | Always `cd ~/meetingmind/backend` before starting server |
-| AssemblyAI `speech_model` deprecated | Use `speech_models=[aai.SpeechModel.universal]` (plural, list) |
-| AssemblyAI `speech_model` deprecated again | Use `speech_models=[aai.SpeechModel.universal]` |
-| Groq `llama3-8b-8192` decommissioned | Replaced with `llama-3.3-70b-versatile` |
+| Chromebook pip3 blocked | Add --break-system-packages to all pip3 commands |
+| uvicorn command not found | Use python3 -m uvicorn instead of uvicorn |
+| Must run from correct folder | Always cd ~/meetingmind/backend before starting |
+| AssemblyAI speech_model deprecated | Use speech_models=[aai.SpeechModel.universal] |
+| Groq llama3-8b-8192 decommissioned | Replaced with llama-3.3-70b-versatile |
+| JSX parse error on curriculum <a> tag | Put all <a> attributes on one line |
+| label variable name conflict in JSX | Renamed loop variable to spkr |
 
 ---
 
 ## GitHub issue — UNRESOLVED
-- Push is blocked due to GH013 secret scanning
-- Old commit `ed46067` contains a real Groq key in `.env.example`
-- All code is safe locally — nothing lost
-- Fix steps:
-  1. Rotate Groq key at https://console.groq.com → API Keys
+- Push blocked — GH013 secret scanning, old commit ed46067
+- All code safe locally, nothing lost
+- Fix when ready:
+  1. Rotate Groq key at https://console.groq.com
   2. Update backend/.env with new key
-  3. Run: `git reset --soft HEAD~3`
-  4. Re-add files: `git add README.md ARCHITECTURE.md DEVLOG.md ROADMAP.md CONTEXT.md`
-  5. Re-add backend: `git add backend/main.py backend/requirements.txt backend/.env.example`
-  6. Re-add frontend: `git add frontend/src/App.jsx frontend/src/index.css frontend/package.json`
-  7. Commit: `git commit -m "Clean rebuild — all fixes applied, no secrets"`
-  8. Force push: `git push origin main --force`
+  3. git reset --soft HEAD~3
+  4. git add README.md ARCHITECTURE.md DEVLOG.md ROADMAP.md CONTEXT.md
+  5. git add backend/main.py backend/requirements.txt backend/.env.example
+  6. git add frontend/src/App.jsx frontend/src/index.css frontend/package.json
+  7. git add frontend/public/AIAB_banner.png frontend/public/AAIB_brochure.png
+  8. git add "frontend/public/AI_Agents_Bootcamp_Curriculum.pdf"
+  9. git commit -m "Clean rebuild — full app, redesigned UI, no secrets"
+  10. git push origin main --force
 
 ---
 
-## Commands to resume this project
-
+## Commands to resume
 ### Start backend
 ```bash
 cd ~/meetingmind/backend
 python3 -m uvicorn main:app --reload --port 8000
 ```
-
 ### Start frontend
 ```bash
-cd ~/meetingmind/frontend
-npm run dev
+cd ~/meetingmind/frontend && npm run dev
 ```
-
 ### Open app
 ```
 http://localhost:5173
 ```
 
-### Open API docs
-```
-http://localhost:8000/docs
-```
-
 ---
 
 ## Next steps in order
-1. Fix GitHub push (rotate Groq key + force push — see above)
-2. Deploy backend to Render (Phase 6 of build guide)
-3. Deploy frontend to Netlify (Phase 6 of build guide)
-4. Test live deployed URL end to end
-5. Share demo URL with prospective students
+1. Redesign MeetingMind upload section (Section 4) — make it stand out
+2. Add Start Meeting button with in-browser voice recording
+3. Add pre-recording message: "Please state your name and position before speaking"
+4. Fix GitHub push (rotate key + force push)
+5. Deploy to Render + Netlify
+6. Share live demo URL with prospective students
 
 ---
 
-## Next session — paste this into a new chat with this message
-"I am continuing the MeetingMind project. Here is my current context file.
+## Next session — paste this into a new chat with:
+"I am continuing the MeetingMind project. Here is my current CONTEXT.md.
 Please read it and help me continue from the next steps."
-Then paste this entire file.

@@ -59,7 +59,10 @@ async def transcribe(audio: UploadFile = File(...)):
         f.write(audio_bytes)
 
     # Submit to AssemblyAI with speaker diarization enabled
-    config = aai.TranscriptionConfig(speaker_labels=True)
+    config = aai.TranscriptionConfig(
+    speaker_labels=True,
+    speech_models=[aai.SpeechModel.universal]
+)
     transcriber = aai.Transcriber()
     transcript = transcriber.submit(temp_path, config)
 
@@ -151,7 +154,7 @@ MEETING TRANSCRIPT:
 {named_transcript}"""
 
     response = groq_client.chat.completions.create(
-        model="llama3-8b-8192",
+        model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"},
         max_tokens=1500
@@ -212,7 +215,7 @@ Write the email with:
 Return only the email text. Nothing else."""
 
     response = groq_client.chat.completions.create(
-        model="llama3-8b-8192",
+        model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         max_tokens=800
     )
