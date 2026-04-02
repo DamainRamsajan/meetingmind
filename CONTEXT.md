@@ -5,6 +5,333 @@
 
 ---
 
+# MeetingMind — Context Update: v2.0 Build Session
+> Append this to your existing CONTEXT.md
+> Last updated: End of v2.0 backend session
+> Current branch: feature/v2-upgrade
+
+---
+
+## SESSION SUMMARY — WHAT WAS DONE THIS SESSION
+
+### Branch created
+- Created feature branch: `feature/v2-upgrade`
+- All v2.0 work happens here — main branch untouched and live
+- Accidentally pushed to main once (no damage — no code changes had been made yet)
+- Confirmed back on feature/v2-upgrade before starting development
+
+### Backend — main.py completely replaced ✅
+- v2.0 backend written and saved
+- NOT yet deployed to Render — waiting for branch merge
+- Verified locally via /docs page
+
+---
+
+## CURRENT STATE
+
+### Branch status
+```
+* feature/v2-upgrade   ← you are here, all v2.0 work
+  main                 ← live app, v1.0, untouched
+```
+
+### What is done
+- ✅ Step 1.1 — new main.py written and saved
+- ✅ Step 1.2 — verified /docs shows 5 routes locally
+- ✅ Step 1.3 — committed to feature/v2-upgrade branch
+- ✅ Step 1.4 — NOT deployed to Render yet (intentional — waiting for merge)
+
+### What is NOT done yet
+- ❌ Step 2 — Frontend upgrade (App.jsx — start here next session)
+- ❌ Render redeployment (after merge)
+- ❌ Branch merge to main
+- ❌ v2.0 GitHub tag
+
+---
+
+## GIT COMMANDS FOR THIS BUILD
+
+### Daily workflow on feature branch
+```bash
+cd ~/meetingmind
+git add .
+git commit -m "your message"
+git push origin feature/v2-upgrade
+```
+
+### Check which branch you are on
+```bash
+git branch
+```
+
+### When v2.0 is fully working — merge and go live
+```bash
+git checkout main
+git merge feature/v2-upgrade
+git push origin main
+```
+
+### Tag v2.0 after merge
+```bash
+git tag -a v2.0 -m "MeetingMind v2.0 — rich analysis, coach, tone selector, demo mode"
+git push origin v2.0
+```
+
+### If you accidentally switch to main
+```bash
+git checkout feature/v2-upgrade
+```
+
+---
+
+## v2.0 BACKEND — COMPLETE SPECIFICATION
+### File: backend/main.py (already replaced ✅)
+
+### Five routes (up from four in v1.0)
+| Route | Method | Input | Output | Status |
+|---|---|---|---|---|
+| / | GET | — | Health check v2.0.0 | ✅ Done |
+| /transcribe | POST | MP3, M4A, WebM | { job_id } | ✅ Done |
+| /status/{job_id} | GET | job_id | utterances + talk_time + confidence | ✅ Done |
+| /analyze | POST | utterances + speaker_map + meeting_context | 13-field JSON | ✅ Done |
+| /draft-email | POST | analysis + tone | { email } | ✅ Done |
+| /coach | POST | analysis subset | coach JSON | ✅ Done |
+
+### New in /transcribe vs v1.0
+- Added `punctuate=True` — cleaner transcript text
+- Added `format_text=True` — better capitalisation and formatting
+- Accepts WebM in addition to MP3 and M4A
+
+### New in /status vs v1.0
+- Returns `talk_time` per speaker:
+```json
+  {
+    "A": { "ms": 22500, "minutes": 0.4, "percentage": 41.7 },
+    "B": { "ms": 16000, "minutes": 0.3, "percentage": 29.6 }
+  }
+```
+- Returns `confidence` score (0-100) from AssemblyAI
+
+### New in /analyze vs v1.0
+- Accepts `meeting_context: { title, date }` — optional
+- Flattens utterances to clean named transcript before sending to Groq
+  - v1.0 sent raw JSON utterance objects
+  - v2.0 sends "Alice: We need to launch by Friday." — better LLM output
+- Returns 13 fields instead of 4:
+```
+summary              — 3-4 sentence executive summary
+decisions            — list of decisions made
+action_items         — list with task/owner/deadline/priority (NEW: priority)
+open_questions       — unresolved questions raised
+parking_lot          — topics deferred to future meeting
+key_topics           — main topics covered
+key_quotes           — notable quotes with speaker attribution
+sentiment            — Positive/Neutral/Mixed/Tense
+sentiment_reason     — one sentence explanation
+effectiveness_score  — integer 1-10
+effectiveness_reason — one sentence explanation
+next_agenda          — suggested items for next meeting
+risk_flags           — blockers, concerns, dependencies
+meeting_type         — Planning/Standup/Retrospective/Decision/
+                       Brainstorm/Client/1-on-1/All-hands/Other
+```
+
+### New in /draft-email vs v1.0
+- Accepts `tone` parameter: "ceo" | "client" | "team"
+- Three distinct writing styles:
+  - **ceo** — bullet points, no fluff, under 200 words, outcomes only
+  - **client** — warm, relationship-first, commitments not tasks, under 300 words
+  - **team** — casual, direct, energetic, uses names, under 250 words
+- Also uses open_questions, parking_lot, next_agenda in prompt
+
+### NEW: /coach endpoint
+- Input: effectiveness_score, effectiveness_reason, open_questions,
+  risk_flags, sentiment, action_items, meeting_type
+- Returns:
+```json
+  {
+    "headline": "punchy one-line meeting quality summary",
+    "top_strength": "single best thing about the meeting",
+    "top_improvement": "single most important change for next time",
+    "agenda_suggestion": ["item 1", "item 2"],
+    "facilitation_tips": ["tip 1", "tip 2"],
+    "score_to_beat": "what a higher score version looks like"
+  }
+```
+- Innovation: prescriptive coaching not just descriptive analysis
+- No other free meeting tool does this
+
+---
+
+## v2.0 FRONTEND — COMPLETE SPECIFICATION
+### File: frontend/src/App.jsx (NOT YET DONE — start here)
+
+### New state variables to add
+```javascript
+const [talkTime, setTalkTime] = useState({})
+const [confidence, setConfidence] = useState(null)
+const [emailTone, setEmailTone] = useState('team')
+const [meetingTitle, setMeetingTitle] = useState('')
+const [meetingDate, setMeetingDate] = useState(
+  new Date().toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  })
+)
+const [transcriptOpen, setTranscriptOpen] = useState(false)
+const [namedTranscript, setNamedTranscript] = useState('')
+const [coachData, setCoachData] = useState(null)
+const [demoMode, setDemoMode] = useState(false)
+```
+
+### New refs to add
+```javascript
+const mediaRecorderRef = useRef(null)
+const audioChunksRef = useRef([])
+const recordingTimerRef = useRef(null)
+```
+
+### New functions to add
+| Function | What it does |
+|---|---|
+| `handleDemoMode()` | Loads pre-built demo utterances, skips upload, runs full pipeline |
+| `downloadMinutes()` | Generates .txt file of full meeting analysis + email |
+| `shareViaEmail()` | Opens mailto with pre-populated subject and email body |
+| `SentimentBadge()` | Renders coloured sentiment pill (Positive/Neutral/Mixed/Tense) |
+| `ScoreRing()` | Renders circular effectiveness score (colour coded) |
+| `TalkTimeBar()` | Renders CSS progress bar per speaker |
+
+### Functions to update
+| Function | What changes |
+|---|---|
+| `startPolling()` | Now captures talk_time and confidence from /status response |
+| `runAnalysis()` | Now passes meeting_context + tone, builds namedTranscript, calls /coach |
+| `handleUpload()` | Now calls shared uploadAudioFile() function |
+| `reset()` | Now clears talkTime, confidence, namedTranscript, coachData, demoMode, transcriptOpen, meetingTitle, meetingDate |
+
+### Demo mode data
+Pre-built 6-utterance product launch meeting with 3 speakers:
+- Speaker A = Alice (meeting chair)
+- Speaker B = Bob (engineering)
+- Speaker C = Carol (marketing)
+- Includes: action items, risk flag (payment gateway), parking lot item (rollback plan)
+- Skips upload and polling entirely — goes straight to /analyze
+
+### New UI sections in results
+| Section | Detail |
+|---|---|
+| Meeting details | Editable title + date inputs at top of results |
+| Stats row | Confidence % + Sentiment badge + Effectiveness ring — 3 column grid |
+| Talk time | CSS bars per speaker with minutes and percentage |
+| Action items | Now includes Priority column with colour-coded badge (High/Med/Low) |
+| Open questions | Orange bordered card |
+| Parking lot | Purple bordered card |
+| Open questions + parking lot | Side by side in a 2-column grid |
+| Risk flags | Red background card — visually urgent |
+| Key quotes | Left-bordered quote style with speaker attribution |
+| Next agenda | Green bordered ordered list |
+| Meeting Coach | Full coaching card — headline, strength, improvement, next level, tips |
+| Email tone selector | CEO / Client / Team toggle buttons — redrafts email on click |
+| Collapsible transcript | Expand/collapse full speaker-labeled transcript |
+| Action buttons | Download Minutes + Share via Email + New Meeting — row of 3 |
+
+### Demo button location
+Below the Start Meeting button in the hero section:
+- Label: "⚡ Try Demo — No Upload Needed"
+- Style: purple glow button
+- Separated by a horizontal rule
+
+---
+
+## STEP BY STEP — WHAT TO DO IN NEXT SESSION
+
+Start a new chat, paste CONTEXT.md, then say:
+"I am continuing MeetingMind v2.0. Backend is done.
+Start me at Step 2.1 — frontend upgrade."
+
+### Step 2.1 — Add new state variables
+Find the existing state block and add 9 new state variables + 3 new refs
+
+### Step 2.2 — Add demo mode data + new functions
+Add DEMO_UTTERANCES array, DEMO_SPEAKER_MAP, handleDemoMode()
+
+### Step 2.3 — Update runAnalysis()
+Add meeting_context, tone, namedTranscript building, /coach call
+
+### Step 2.4 — Update startPolling()
+Capture talk_time and confidence from /status response
+
+### Step 2.5 — Add downloadMinutes() and shareViaEmail()
+
+### Step 2.6 — Update reset()
+Clear all new state variables
+
+### Step 2.7 — Add helper components
+SentimentBadge, ScoreRing, TalkTimeBar — add before return statement
+
+### Step 2.8 — Replace results section
+Full replacement of results JSX with all new cards
+
+### Step 2.9 — Add demo button to hero section
+Below Start Meeting button
+
+### Step 2.10 — Save, test locally, commit to feature branch
+```bash
+git add .
+git commit -m "v2.0 frontend: rich results, demo mode, coach, tone selector"
+git push origin feature/v2-upgrade
+```
+
+### Step 2.11 — Merge to main and deploy
+```bash
+git checkout main
+git merge feature/v2-upgrade
+git push origin main
+```
+Then Render manual deploy → verify live URL
+
+### Step 2.12 — Tag v2.0
+```bash
+git tag -a v2.0 -m "MeetingMind v2.0 complete"
+git push origin v2.0
+```
+
+---
+
+## ALL BUGS AND FIXES — CUMULATIVE LIST
+### (Additions to v1.0 list)
+
+| # | Problem | Fix | File |
+|---|---|---|---|
+| 13 | Accidentally pushed to main during branch setup | No damage — no code changes made yet, switched back to feature branch | Git |
+
+---
+
+## INNOVATION FEATURES IN v2.0
+### (For workshop and demo narrative)
+
+| Feature | Why it's novel |
+|---|---|
+| Email tone selector | Same meeting data → 3 completely different emails in one click. No meeting tool does this. |
+| Meeting Coach | Prescriptive improvement advice, not just descriptive analysis. Tells you what to do differently next time. |
+| Talk time analytics | Calculated free from AssemblyAI timestamps — no extra API cost. Shows who dominates meetings. |
+| Demo mode | Zero friction — visitors see full results without uploading anything. Conversion tool. |
+| 13-field extraction | Most tools give summary + action items. We give 13 fields including risk flags, key quotes, parking lot. |
+| Confidence score | Trust signal. Shows how accurately the AI transcribed. No other free tool surfaces this. |
+
+---
+
+## OPENING MESSAGE FOR NEXT CHAT
+
+Copy and paste this exactly:
+
+"I am continuing the MeetingMind project — AI Agents Bootcamp workshop app.
+I am on branch feature/v2-upgrade.
+v2.0 backend is complete (main.py replaced, 5 routes, not yet deployed to Render).
+v1.0 is live on main branch — do not touch main.
+Here is my complete CONTEXT.md. Please start me at Step 2.1 — frontend upgrade of App.jsx."
+
+Then paste the full CONTEXT.md.
+
 ## 🏁 CURRENT STATUS — v1.0 LIVE ✅
 
 ### Live URLs
