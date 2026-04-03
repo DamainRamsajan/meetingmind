@@ -4,10 +4,319 @@
 > Purpose: Paste this into a new chat to continue instantly with zero lost context
 
 ---
+---
+## SESSION UPDATE — v2.0 FULLY DEPLOYED & WORKING
+> Date: april 3rd 10:41am
+> Status: ✅ PRODUCTION LIVE — all features working
+
+### What Was Fixed This Session
+
+1. **CORS OPTIONS Preflight Error** ✅
+   - Problem: OPTIONS requests to `/status` and `/analyze` returned 400 Bad Request
+   - Cause: CORS middleware needed explicit OPTIONS method
+   - Fix: Changed `allow_methods=["*"]` to `allow_methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"]`
+   - Also fixed typo: `aapp` → `app`
+
+### Current Production Status
+
+| Service | URL | Status |
+|---------|-----|--------|
+| Frontend (Netlify) | https://dancing-gecko-e9a899.netlify.app | ✅ LIVE |
+| Backend (Render) | https://meetingmind-api.onrender.com | ✅ LIVE |
+| API Docs | https://meetingmind-api.onrender.com/docs | ✅ 6 routes |
+
+### v2.0 Features Confirmed Working
+- ✅ Demo mode (purple "DEMO REPORT" button)
+- ✅ Browser recording (fixed WebM support)
+- ✅ File upload (MP3/M4A)
+- ✅ 13-field extraction
+- ✅ Email tone selector (CEO/Client/Team)
+- ✅ Meeting Coach
+- ✅ Talk time bars
+- ✅ Download/Share buttons
+
+### Files Modified
+- `backend/main.py` - CORS configuration fix
+
+### Git State
+- Branch: `main`
+- Latest commit: CORS fix pushed
+- Tag: `v2.0` created
+- Remote: ✅ synced
+
+### Next Steps (Optional)
+- Test on mobile devices
+- Add meeting history (localStorage)
+- PDF export
+- Workshop student guides
+
+---
+
+## OPENING MESSAGE FOR NEXT CHAT
+
+"I am continuing MeetingMind v2.0. The app is fully deployed and working at https://dancing-gecko-e9a899.netlify.app. Backend is at https://meetingmind-api.onrender.com. All v2.0 features are live. Here is my CONTEXT.md."
+
+---
+
+## QUICK COMMANDS
+
+```bash
+# Pull latest
+cd ~/meetingmind && git pull origin main
+
+# Restart locally
+cd backend && python3 -m uvicorn main:app --reload --port 8000
+cd frontend && npm run dev
+
+# Check production
+curl https://meetingmind-api.onrender.com/
+---
+## SESSION UPDATE — v2.0 Recording Bug Fixed, Deployed, Network Error Diagnosed
+> Date: april 3rd 2026, 9:35 am
+> Status: ✅ Backend deployed, ⚠️ Frontend network error being fixed
+
+### What Was Accomplished This Session
+
+#### 1. Recording Bug Fixed ✅
+- **Problem**: Browser recording returned "Only MP3/M4A supported" error
+- **Root cause**: 
+  - Chromebook Linux container networking
+  - Missing file validation in `/transcribe` endpoint
+  - Browser MediaRecorder sends WebM files without proper extension handling
+- **Fix applied to `backend/main.py`**:
+  - Added file extension validation (.mp3, .m4a, .webm)
+  - Added content-type detection for WebM files
+  - Automatic filename fixing when browser sends no extension
+  - Debug logging for troubleshooting
+- **Verification**: Recording works locally on Chromebook at http://localhost:5174
+
+#### 2. Chromebook-Specific Configuration ✅
+- **Issue**: Linux container uses different IP than localhost
+- **Solution**:
+  - Identified Linux container IP: `100.115.92.198`
+  - Updated frontend `.env` with `VITE_API_URL=http://100.115.92.198:8000`
+  - Bound backend to `0.0.0.0:8000` for container access
+  - Both services communicating properly on Chromebook
+- **Local test confirmed**: Everything works at http://localhost:5174
+
+#### 3. v2.0 Deployment to Render ✅
+- **Backend successfully deployed** to: https://meetingmind-api.onrender.com
+- **Verified endpoints**:
+  - `GET /` → Returns version 2.0.0
+  - `GET /docs` → Shows 6 routes (/, /transcribe, /status, /analyze, /draft-email, /coach)
+- **Environment variables set**:
+  - `ASSEMBLYAI_API_KEY` (32-char string)
+  - `GROQ_API_KEY` (starts with gsk_)
+- **Deployment status**: Live and responding
+
+#### 4. v2.0 Frontend Deployed to Netlify ⚠️
+- **Frontend URL**: https://dancing-gecko-e9a899.netlify.app
+- **Issue discovered**: Network error when clicking buttons
+- **Likely cause**: Netlify not picking up `VITE_API_URL` environment variable
+- **Current status**: Investigating network error
+
+### Current State
+
+| Component | Status | URL |
+|-----------|--------|-----|
+| Backend (v2.0) | ✅ Live | https://meetingmind-api.onrender.com |
+| Frontend (v2.0) | ⚠️ Network error | https://dancing-gecko-e9a899.netlify.app |
+| Local Backend | ✅ Working | http://100.115.92.198:8000 |
+| Local Frontend | ✅ Working | http://localhost:5174 |
+| Git Branch | main | Merged and pushed |
+| v2.0 Tag | ✅ Created | Tag pushed to GitHub |
+
+### Files Modified This Session
+
+| File | Changes |
+|------|---------|
+| `backend/main.py` | Added file validation, content-type detection, WebM support, debug logging to `/transcribe` endpoint |
+| `frontend/.env` | Updated VITE_API_URL to http://100.115.92.198:8000 for Chromebook local testing |
+| `frontend/netlify.toml` | Created for environment variable configuration (optional) |
+| `frontend/src/App.jsx` | Verified correct (no changes needed) |
+
+### Open Issues
+
+| # | Problem | Status | Priority |
+|---|---------|--------|----------|
+| 1 | Netlify frontend network error | 🔍 Diagnosing | High |
+| 2 | `VITE_API_URL` not loading in production | 🔍 Investigating | High |
+| 3 | CORS potentially blocking requests | 🔍 Checking | Medium |
+
+### Current Debugging Steps
+
+#### What We've Tried:
+1. ✅ Backend deployed and verified working
+2. ✅ Frontend deployed to Netlify
+3. ✅ Identified network error in browser console
+4. ⚠️ Need to check actual error message
+
+#### What We Need to Do:
+1. [ ] Open browser console on Netlify site (Ctrl+Shift+J on Chromebook)
+2. [ ] Check what `import.meta.env.VITE_API_URL` returns
+3. [ ] Test backend connection with fetch()
+4. [ ] Set environment variable in Netlify dashboard
+5. [ ] Redeploy frontend with correct config
+
+### Git Commands Executed
+
+```bash
+# Commit recording fix
+git add backend/main.py
+git commit -m "fix: add file validation and WebM support to /transcribe endpoint"
+git push origin feature/v2-upgrade
+
+# Merge to main
+git checkout main
+git merge feature/v2-upgrade
+git push origin main
+
+# Tag v2.0 release
+git tag -a v2.0 -m "MeetingMind v2.0 — Production Release"
+git push origin v2.0
+
+Deployment Commands Used
+Render Backend Deployment:
+Manual deploy triggered from Render dashboard
+
+Build successful
+
+Service running at https://meetingmind-api.onrender.com
+
+Netlify Frontend Deployment:
+Auto-deploy from GitHub main branch
+
+Build command: npm run build
+
+Publish directory: dist
+
+⚠️ Environment variable not configured in Netlify dashboard
+
+Next Steps to Fix Network Error
+Step 1: Diagnose the Error
+javascript
+// Open browser console on Netlify site (Ctrl+Shift+J)
+// Run these commands:
+
+// Check API URL
+console.log('API URL:', import.meta.env.VITE_API_URL)
+
+// Test backend connection
+fetch('https://meetingmind-api.onrender.com/')
+  .then(r => r.json())
+  .then(data => console.log('Backend response:', data))
+  .catch(err => console.error('Backend error:', err))
+
+// Check protocol (must be HTTPS for microphone)
+console.log('Protocol:', window.location.protocol)
+Step 2: Fix Netlify Environment Variable
+Go to https://app.netlify.com
+
+Click site: dancing-gecko-e9a899
+
+Site configuration → Environment variables
+
+Add variable:
+
+Key: VITE_API_URL
+
+Value: https://meetingmind-api.onrender.com
+
+Save
+
+Trigger deploy: Deploys → Trigger deploy → Deploy site
+
+Step 3: Alternative Quick Fix (if Netlify UI doesn't work)
+bash
+# Create netlify.toml in frontend folder
+cd ~/meetingmind/frontend
+
+cat > netlify.toml << 'EOF'
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  VITE_API_URL = "https://meetingmind-api.onrender.com"
+EOF
+
+# Commit and push
+git add netlify.toml
+git commit -m "Add netlify.toml with VITE_API_URL"
+git push origin main
+Step 4: Test Backend Directly
+bash
+# In browser, go to:
+https://meetingmind-api.onrender.com/
+# Should show: {"status":"MeetingMind is running!","version":"2.0.0"}
+
+https://meetingmind-api.onrender.com/docs
+# Should show FastAPI documentation with 6 routes
+What the Network Error Likely Is
+Most probable cause: Netlify doesn't automatically read .env files. You must manually set VITE_API_URL in their dashboard.
+
+Error would look like:
+
+GET http://localhost:8000/transcribe net::ERR_CONNECTION_REFUSED
+
+Or VITE_API_URL is undefined
+
+Or Failed to fetch
+
+Fix: Set environment variable in Netlify dashboard and redeploy.
+
+Innovation Features Successfully Deployed
+Feature	Status	Notes
+13-field extraction	✅ Backend ready	Includes priority, risk flags, parking lot
+Email tone selector	✅ Backend ready	CEO/Client/Team tones
+Meeting Coach	✅ Backend ready	Prescriptive advice
+Talk time analytics	✅ Backend ready	From AssemblyAI timestamps
+Confidence scoring	✅ Backend ready	From AssemblyAI
+Demo mode	✅ Frontend ready	Pre-built product launch meeting
+Download minutes	✅ Frontend ready	.txt export
+Share via email	✅ Frontend ready	mailto: pre-populated
+Collapsible transcript	✅ Frontend ready	Expand/collapse
+Priority badges	✅ Frontend ready	High/Medium/Low
+NEXT SESSION OPENING MESSAGE
+Copy this for your next chat:
+
+"I am continuing MeetingMind v2.0 deployment. Backend is live at https://meetingmind-api.onrender.com and working. Frontend is deployed to Netlify at https://dancing-gecko-e9a899.netlify.app but has a network error when clicking buttons. The issue is likely that VITE_API_URL is not set in Netlify environment variables. Here is my updated CONTEXT.md with all changes from the recording bug fix through deployment. Please help me diagnose the browser console errors and fix the network issue."
+
+QUICK REFERENCE: Useful URLs
+Service	URL	Status
+Production Frontend	https://dancing-gecko-e9a899.netlify.app	⚠️ Network error
+Production Backend	https://meetingmind-api.onrender.com	✅ Working
+Backend API Docs	https://meetingmind-api.onrender.com/docs	✅ Working
+GitHub Repository	https://github.com/DamainRamsajan/meetingmind	✅ v2.0 tagged
+Netlify Dashboard	https://app.netlify.com/sites/dancing-gecko-e9a899	Need to set env var
+Render Dashboard	https://dashboard.render.com	✅ Configured
+COMMANDS FOR NEXT SESSION
+bash
+# Check backend health
+curl https://meetingmind-api.onrender.com/
+
+# Check frontend build
+cd ~/meetingmind/frontend
+npm run build
+
+# Test locally before deploy
+npm run dev
+
+# Git status
+git status
+git log --oneline -5
+
+# If need to redeploy frontend after fixing env var
+git add .
+git commit -m "Fix: Add VITE_API_URL to Netlify environment"
+git push origin main
+Summary: Backend is live and working. Frontend is deployed but has a configuration issue (missing environment variable). Once we set VITE_API_URL in Netlify dashboard and redeploy, v2.0 will be fully live. The recording bug is fixed and all v2.0 features are ready to go.
+
+Current blocker: Need to open browser console on Netlify site to see exact error message, then set environment variable in Netlify dashboard.
 
 ---
 ## SESSION UPDATE — v2.0 Recording Bug Fixed & Ready for Deployment
-> Date: Current session
+> Date: april 2nd 11pm
 > Status: ✅ All bugs resolved, ready for merge
 
 ### What Was Accomplished This Session
