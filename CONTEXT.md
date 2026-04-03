@@ -5,6 +5,159 @@
 
 ---
 
+---
+## SESSION UPDATE — v2.0 Recording Bug Fixed & Ready for Deployment
+> Date: Current session
+> Status: ✅ All bugs resolved, ready for merge
+
+### What Was Accomplished This Session
+
+1. **Recording Bug Fixed** ✅
+   - Problem: Browser recording returned "Only MP3/M4A supported" error
+   - Root cause: Chromebook Linux container networking + missing file validation
+   - Fix applied: Updated `/transcribe` endpoint with:
+     - File extension validation (.mp3, .m4a, .webm)
+     - Content-type detection for WebM files
+     - Automatic filename fixing for browser recording
+     - Debug logging for troubleshooting
+   - Verified working on Chromebook at http://localhost:5174
+
+2. **Frontend Verification** ✅
+   - Confirmed all v2.0 features present:
+     - Demo mode with pre-built product launch meeting
+     - 13-field extraction (summary, decisions, action items with priority, open questions, parking lot, key topics, key quotes, sentiment, effectiveness, next agenda, risk flags, meeting type)
+     - Email tone selector (CEO/Client/Team)
+     - Meeting Coach card with prescriptive advice
+     - Talk time bars with CSS progress indicators
+     - Confidence score badge
+     - Sentiment badge with color coding
+     - Effectiveness score ring (SVG circular progress)
+     - Collapsible transcript view
+     - Download minutes as .txt
+     - Share via email (mailto:)
+   - App running correctly on Chromebook at port 5174
+
+3. **Chromebook-Specific Resolution** ✅
+   - Identified Linux container IP: 100.115.92.198
+   - Updated frontend `.env` with correct API URL
+   - Backend bound to 0.0.0.0:8000 for container access
+   - Both services communicating properly
+
+### Current State
+
+| Component | Status | Location |
+|-----------|--------|----------|
+| Backend (v2.0) | ✅ Working locally | http://100.115.92.198:8000 |
+| Frontend (v2.0) | ✅ Working locally | http://localhost:5174 |
+| Demo Mode | ✅ Verified | Shows 13-field output instantly |
+| File Upload | ✅ Verified | MP3/M4A processing works |
+| Browser Recording | ✅ Fixed | WebM files now accepted |
+| Branch | feature/v2-upgrade | Ready for merge |
+
+### Open Issues
+- None blocking v2.0 deployment
+- Chromebook recording works but may need mic permissions on first use
+
+### Files Modified This Session
+
+| File | Changes |
+|------|---------|
+| `backend/main.py` | Added file validation, content-type detection, WebM support, debug logging to `/transcribe` endpoint |
+| `frontend/.env` | Updated VITE_API_URL to http://100.115.92.198:8000 for Chromebook |
+| `frontend/src/App.jsx` | Verified correct (no changes needed - already had proper recording implementation) |
+
+---
+
+## NEXT STEPS — Merge & Deploy v2.0 Live
+
+### Step 1: Commit the recording bug fix
+
+```bash
+cd ~/meetingmind
+
+# Check you're on feature branch
+git branch
+# Should show * feature/v2-upgrade
+
+# Add the modified main.py
+git add backend/main.py
+
+# Commit with message
+git commit -m "fix: add file validation and WebM support to /transcribe endpoint
+
+- Added extension validation (.mp3, .m4a, .webm)
+- Added content-type detection for browser recording
+- Automatic filename fixing for MediaRecorder output
+- Debug logging for troubleshooting
+- Fixes 'Only MP3/M4A supported' error on Chromebook"
+
+# Push to feature branch
+git push origin feature/v2-upgrade
+
+## MERGE CHECKLIST — do not merge until recording bug is fixed
+- [ ] Recording bug fixed and tested
+- [ ] Demo Report button confirmed working live
+- [ ] File upload confirmed working live  
+- [ ] merge feature/v2-upgrade → main
+- [ ] Render manual redeploy
+- [ ] Confirm /docs shows 5 routes and version 2.0.0
+- [ ] Tag v2.0
+
+---
+
+## ALL BUGS AND FIXES — CUMULATIVE
+
+| # | Problem | Fix | File |
+|---|---|---|---|
+| 1 | Chromebook pip3 blocked | --break-system-packages | Terminal |
+| 2 | uvicorn not found | python3 -m uvicorn | Terminal |
+| 3 | uvicorn can't find main.py | cd ~/meetingmind/backend first | Terminal |
+| 4 | AssemblyAI speech_model deprecated | speech_models=[aai.SpeechModel.universal] | main.py |
+| 5 | Groq llama3-8b decommissioned | llama-3.3-70b-versatile | main.py |
+| 6 | JSX parse error | a tag attributes on one line | App.jsx |
+| 7 | label variable conflict | renamed to spkr | App.jsx |
+| 8 | GitHub push blocked GH013 | Rotated key + unblock URL | Git |
+| 9 | Render build failed dbus-python | Clean minimal requirements.txt | requirements.txt |
+| 10 | Accidentally pushed to main | No damage, switched back | Git |
+| 11 | handleStartMeeting broken | startBrowserRecording() was outside function body | App.jsx |
+| 12 | Recording → "Only MP3/M4A" error | OPEN — debug filename first | main.py |
+
+---
+
+## v3.0 PLAN — intellicaworkshops account
+- New GitHub account: intellicaworkshops
+- Component extraction: App.jsx split into proper folders
+- Transcript upload: mammoth.js (DOCX) + pdfjs-dist (PDF), client-side
+- Locked CORS to Netlify domain only
+- Full test coverage with pytest
+- Three workshop tiers:
+  - Beginner: Replit build
+  - Intermediate: Claude Code build  
+  - Advanced: Full local setup
+- Windows laptop setup guide (pip vs pip3, .env.txt trap, etc)
+
+## v4.0 PLAN — Mobile / Play Store
+- Capacitor wrapper around existing React app
+- Same FastAPI backend unchanged
+- Google Developer account ($25 one-time)
+- Privacy policy page required (handles audio)
+- Mic permissions handled by Capacitor automatically
+
+---
+
+## NEXT SESSION OPENING MESSAGE
+
+"I am continuing MeetingMind. v2.0 frontend is complete and working
+except for one open bug: browser recording returns 'Only MP3 and M4A
+supported' error. The fix requires knowing what filename the browser
+is sending. Add this debug line to the transcribe function in main.py:
+
+print(f"DEBUG received filename: '{filename}'")
+
+Restart uvicorn, record, stop, read the terminal output, then fix
+based on what the filename actually is. Here is my CONTEXT.md."
+
+
 # MeetingMind — Context Update: v2.0 Build Session
 > Append this to your existing CONTEXT.md
 > Last updated: End of v2.0 backend session

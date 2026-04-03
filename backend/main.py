@@ -49,25 +49,57 @@ def home():
 # ══════════════════════════════════════════════════════════
 @app.post("/transcribe")
 async def transcribe(audio: UploadFile = File(...)):
-    filename = audio.filename.lower()
-    allowed = (".mp3", ".m4a", ".webm")
-    if not any(filename.endswith(ext) for ext in allowed):
-        return {"error": "Only MP3, M4A, and WebM files are supported."}
-
+    # Get filename and content type
+    filename = audio.filename
+    content_type = audio.content_type or ''
+    
+    print(f"🔍 DEBUG - Original filename: '{filename}'")
+    print(f"🔍 DEBUG - Content type: '{content_type}'")
+    
+    # FIX: Browser MediaRecorder often sends filename without extension
+    # Force correct filename based on content type
+    if not filename or '.' not in filename:
+        if 'webm' in content_type:
+            filename = 'recording.webm'
+        elif 'mp4' in content_type or 'm4a' in content_type:
+            filename = 'recording.m4a'
+        elif 'mp3' in content_type:
+            filename = 'recording.mp3'
+        else:
+            filename = 'recording.webm'  # Default fallback
+    
+    print(f"🔍 DEBUG - Fixed filename: '{filename}'")
+    
+    # Validate file extension
+    file_ext = filename.lower().split('.')[-1]
+    allowed_extensions = ['mp3', 'm4a', 'webm']
+    
+    print(f"🔍 DEBUG - Extension: '{file_ext}'")
+    
+    if file_ext not in allowed_extensions:
+        return {
+            "error": f"Only {', '.join(allowed_extensions)} supported. Got: {file_ext}"
+        }
+    
+    # Read and save the file
     audio_bytes = await audio.read()
     temp_path = f"/tmp/meeting_{filename}"
     with open(temp_path, "wb") as f:
         f.write(audio_bytes)
-
+    
+    # Submit to AssemblyAI
     config = aai.TranscriptionConfig(
         speaker_labels=True,
         speech_models=[aai.SpeechModel.universal],
         punctuate=True,
         format_text=True,
     )
-
+    
     transcriber = aai.Transcriber()
     transcript = transcriber.submit(temp_path, config)
+    
+    print(f"✅ Submitted to AssemblyAI - Job ID: {transcript.id}")
+    
     return {"job_id": transcript.id}
 
 
