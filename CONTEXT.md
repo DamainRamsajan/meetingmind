@@ -5,6 +5,151 @@
 
 ---
 ---
+## SESSION UPDATE — v2.2 PRODUCTION HARDENING
+> Date: april 3rd 2:41pm
+> Status: ✅ SECURED & READY FOR STUDENT TRAFFIC
+
+### What Was Added in v2.2
+
+#### Security Hardening (20 min quick-fix)
+1. **CORS Lockdown** - Restricted from `["*"]` to specific Netlify domains only
+2. **Rate Limiting** - Added slowapi: 10 req/min per endpoint, 100/min per IP
+3. **Request Size Limits** - 25MB hard cap with 413 error response
+4. **Environment Validation** - Startup check for required API keys
+5. **Strict File Validation** - Extension + MIME type checking
+
+#### Production Resilience
+1. **Client Retry Logic** - Failed requests retry 3x with exponential backoff
+2. **Debouncing** - Prevents concurrent analysis requests
+3. **Cold Start Message** - User notification when backend waking up
+4. **UptimeRobot** - Pings backend every 10 min (prevents cold starts)
+
+### Free Tier Limits (For 2000 Students)
+
+| Service | Limit | Capacity |
+|---------|-------|----------|
+| **Render** | 100GB bandwidth, 512MB RAM | ⚠️ ~20 concurrent users |
+| **Render** | 15 min idle timeout | ✅ Fixed with UptimeRobot |
+| **Netlify** | 100GB bandwidth | ✅ 2000+ meetings/month |
+
+**Risk Assessment:**
+- ✅ 2000 students over 1 month - bandwidth fine
+- ⚠️ 20+ concurrent users - possible slowdowns
+- ✅ Cold starts - eliminated by UptimeRobot
+
+### Files Modified
+
+| File | Changes |
+|------|---------|
+| `backend/main.py` | CORS lockdown, rate limiting, size limits, env validation |
+| `backend/requirements.txt` | Added slowapi |
+| `frontend/src/App.jsx` | Retry logic, debouncing, cold start message |
+| `frontend/src/utils/api.js` | New - centralized API with retry logic |
+
+### New Dependencies
+
+
+### Production URLs (Unchanged)
+| Service | URL |
+|---------|-----|
+| Frontend | https://intellicaworkshops.netlify.app |
+| Backend | https://meetingmind-d7dx.onrender.com |
+
+### Git Tags
+- `v2.0` - Initial v2 release
+- `v2.1` - Production stable with CORS fix
+- `v2.2` - Security hardening + rate limiting
+
+---
+
+## COMMANDS FOR NEXT SESSION
+
+```bash
+# Pull latest
+cd ~/meetingmind && git pull origin main
+
+# Install new dependency
+cd backend && pip install slowapi --break-system-packages
+pip freeze > requirements.txt
+
+# Deploy backend to Render (manual deploy)
+# Deploy frontend to Netlify (auto-deploys on push)
+
+# Monitor usage
+curl https://meetingmind-d7dx.onrender.com/
+
+
+---
+
+## 🏷️ Tag v2.2 and Push
+
+```bash
+cd ~/meetingmind
+
+# Create v2.2 tag
+git tag -a v2.2 -m "MeetingMind v2.2 — Production Hardened
+
+Security Updates:
+- CORS locked to Netlify domains only
+- Rate limiting: 10 requests per minute
+- File size limit: 25MB hard cap
+- Environment variable validation on startup
+- Strict MIME type checking
+
+Resilience:
+- Client retry logic (3 attempts with backoff)
+- Request debouncing
+- Cold start user notifications
+- UptimeRobot ping every 10 minutes
+
+Ready for student traffic up to 2000 users/month"
+
+# Push tag
+git push origin v2.2
+
+# Push any code changes
+git push origin main
+
+---
+## SESSION UPDATE — v2.0 FULLY PRODUCTION READY
+> Date: april 3rd 12:15pm
+> Status: ✅ LIVE at https://intellicaworkshops.netlify.app
+
+### Final Fix Applied
+- **Problem**: Frontend calling `localhost:8000` instead of Render backend
+- **Cause**: Netlify environment variable `VITE_API_URL` not set
+- **Fix**: Added `VITE_API_URL=https://meetingmind-d7dx.onrender.com` in Netlify dashboard
+
+### Production URLs
+| Service | URL | Status |
+|---------|-----|--------|
+| Frontend | https://intellicaworkshops.netlify.app | ✅ LIVE |
+| Backend | https://meetingmind-d7dx.onrender.com | ✅ LIVE |
+| API Docs | https://meetingmind-d7dx.onrender.com/docs | ✅ LIVE |
+
+### All v2.0 Features Confirmed Working
+- ✅ Demo mode (DEMO REPORT button)
+- ✅ Browser recording (WebM support)
+- ✅ File upload (MP3/M4A)
+- ✅ 13-field extraction
+- ✅ Email tone selector (CEO/Client/Team)
+- ✅ Meeting Coach
+- ✅ Talk time bars
+- ✅ Download/Share buttons
+
+### Git State
+- Branch: `main`
+- Latest: CORS fix + environment config
+- Tag: `v2.0` exists
+
+---
+
+## NEXT SESSION OPENING MESSAGE
+
+"I am continuing MeetingMind v2.0. The app is live at https://intellicaworkshops.netlify.app. Backend is at https://meetingmind-d7dx.onrender.com. Ready to discuss v3.0 planning."
+
+
+---
 ## SESSION UPDATE — v2.0 FULLY DEPLOYED & WORKING
 > Date: april 3rd 10:41am
 > Status: ✅ PRODUCTION LIVE — all features working

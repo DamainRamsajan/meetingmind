@@ -635,21 +635,25 @@ export default function App() {
         <div style={S.card}>
           <span style={S.label}>Workshop Materials</span>
           <h2 style={{ fontSize: 20, fontWeight: 800, margin: '0 0 24px', color: '#e8f0fe' }}>
-            AI Agents Bootcamp
+            AI Agents Bootcamp 
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-            <div style={{ background: '#080d18', border: '1px solid #1e3a5f', borderRadius: 12, overflow: 'hidden' }}>
-              <img src="/AAIB_brochure.png" alt="AI Agents Bootcamp Brochure"
-                style={{ width: '100%', display: 'block', height: 220, objectFit: 'cover' }} />
-              <div style={{ padding: '14px 16px' }}>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#e8f0fe' }}>Workshop Brochure</p>
-                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#6b7fa3' }}>Overview, outcomes, and who this is for</p>
+            {/* Lines 683-695: Brochure Card - NOW CLICKABLE */}
+                        {/* Lines 683-695: Brochure Card - NOW CLICKABLE */}
+            <a href="/AIAB_June5th_brochure.png" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+              <div style={{ background: '#080d18', border: '1px solid #1e3a5f', borderRadius: 12, overflow: 'hidden', cursor: 'pointer' }}>
+                <img src="/AIAB_brchre_thumbnail.png" alt="AI Agents Bootcamp Brochure"
+                  style={{ width: '100%', display: 'block', height: 220, objectFit: 'cover' }} />
+                <div style={{ padding: '14px 16px' }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#e8f0fe' }}>Workshop Brochure</p>
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: '#6b7fa3' }}>Overview, outcomes, and who this is for</p>
+                </div>
               </div>
-            </div>
+            </a>
             <a href="/AI_Agents_Bootcamp_Curriculum.pdf" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
               <div style={{ background: '#080d18', border: '1px solid #7c3aed66', borderRadius: 12, overflow: 'hidden', cursor: 'pointer' }}>
                 <div style={{ position: 'relative', height: 220, overflow: 'hidden' }}>
-                  <img src="/AIAB_banner1.png" alt="Curriculum"
+                  <img src="/AIAB_CUR_Thumbnail.png" alt="Curriculum"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.5)' }} />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex',
                     flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>

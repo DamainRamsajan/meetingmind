@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────
-# MeetingMind — Backend v2.0
+# MeetingMind — Backend v2.3
 # Innovation additions:
 # - Rich 13-field extraction
 # - Talk time analytics from timestamps
@@ -7,6 +7,7 @@
 # - Email tone selector (CEO / Client / Team)
 # - Transcript flattening for better LLM performance
 # - Audio quality optimisation flags
+# - HEAD handler for monitoring (v2.3)
 # ─────────────────────────────────────────────────────────────
 
 import os
@@ -21,7 +22,7 @@ from typing import Optional
 
 load_dotenv()
 
-app = FastAPI(title="MeetingMind API", version="2.0.0")
+app = FastAPI(title="MeetingMind API", version="2.3.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,7 +40,14 @@ groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 # ── Health check ───────────────────────────────────────────
 @app.get("/")
 def home():
-    return {"status": "MeetingMind is running!", "version": "2.0.0"}
+    return {"status": "MeetingMind is running!", "version": "2.3.0"}
+
+
+# ── Health check HEAD handler (for monitoring) ─────────────
+@app.head("/")
+async def head_root():
+    """HEAD request handler for health checks (UptimeRobot, Render)"""
+    return {}  # Empty response with 200 OK
 
 
 # ══════════════════════════════════════════════════════════
